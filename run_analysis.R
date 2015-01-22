@@ -1,26 +1,47 @@
 library(dplyr)
 
-#  check working directory and change if needed to directory where files are
-#  see code book for list of unzipped text files used in this project 
+#  Per the instructions for the course project, the Samsung data must be in your working directory.
+#  Please check your working directory and change it if needed to the directory where the Samsung files are.
+#  See the accompanying code book for the list of the eight unzipped data text files used in this project. 
 
-#  create list of files in the working directory
+#  Create list of the eight files needed
 
-tempfiles = list.files(pattern="*.txt")
+FilesNeeded <- list("X_test.txt", "X_train.txt",  "y_test.txt", "y_train.txt",
+"subject_test.txt", "subject_train.txt", "activity_labels.txt", "features.txt")
 
-#  load in all data files, using file names for the table names after removing the ".txt" extensions
+#  Create list of text files in the working directory
 
-for (i in 1:length(tempfiles)) {
-  assign(sub(".txt", "", tempfiles[i]), 
-         read.table(tempfiles[i], stringsAsFactors=FALSE))
+DirFiles = list.files(pattern="*.txt")
+
+
+#  Check that all FilesNeeded are in DirFile and, if so, read in.
+#  For faster reading, nrows and colClasses have been specified.
+
+msg <- "One or more Samsung data files does not appear to be in your working directory.\n
+Please check to make sure all eight files are there."
+
+if(!all(FilesNeeded %in% DirFiles)) {
+  stop(msg)
+} else {  
+  X_test <- read.table("X_test.txt", stringsAsFactors=FALSE, nrows=2950, colClasses="numeric")
+  X_train <- read.table("X_train.txt", stringsAsFactors=FALSE, nrows=7360, colClasses="numeric")
+  y_test <- read.table("y_test.txt", stringsAsFactors=FALSE, nrows=2950, colClasses="integer")
+  y_train <- read.table("y_train.txt", stringsAsFactors=FALSE, nrows=7360, colClasses="integer")
+  subject_test <- read.table("subject_test.txt", stringsAsFactors=FALSE, nrows=2950, colClasses="integer")
+  subject_train <- read.table("subject_train.txt", stringsAsFactors=FALSE, nrows=7360, colClasses="integer")
+  activity_labels <- read.table("activity_labels.txt", stringsAsFactors=FALSE, nrows=6, colClasses=c("integer", "character"))
+  features <- read.table("features.txt", stringsAsFactors=FALSE, nrows=561, colClasses=c("integer", "character"))  
 }
 
-#  add subject and activity codes to data files
 
+#  add activity and subject codes to data files
+
+X_test$activity.id <- y_test$V1
 X_test$subject  <- subject_test$V1
-X_test$activity <- y_test$V1
 
+X_train$activity.id <- y_train$V1
 X_train$subject <- subject_train$V1
-X_train$activity <- y_train$V1
+
 
 #  merge data files
 
@@ -43,7 +64,7 @@ merged.file.reduced <- merged.file[, c(mean.stdev.cols, 562, 563)]
 
 new.features <- features[mean.stdev.cols,]
 
-#  make names more R friendly
+#  make names more R friendly (see accompanying CodeBook and README for explanation of naming convention)
 
 new.features$V2 <- gsub("-", ".", new.features$V2)
 new.features$V2 <- sub("\\(\\)", "", new.features$V2)
@@ -54,25 +75,24 @@ new.features$V2 <- sub("^f", "f.", new.features$V2)
 
 colnames(merged.file.reduced)[1:66] <- new.features$V2
 
-#  move subject and activity IDs to first two columns
+#  move activity.id and subject IDs to first two columns
 
 merged.file.reduced <- merged.file.reduced[, c(67, 68, 1:66)]
 
 #  compute means for all columns using dplyr
 
 tidy.data <- merged.file.reduced %>%
-  group_by(subject, activity) %>%
-  summarise_each(funs(mean)) %>%
-  arrange(subject, activity)
+  group_by(activity.id, subject) %>%
+  summarise_each(funs(mean))  
 
 #  prepare activity names
 
 activity_labels$V2 <- tolower(gsub("_", ".", activity_labels$V2))
 
-#  attach activity names to activities, rearrange columns, and sort by subject and activity
+#  attach activity names to activity.ids, rearrange columns, and sort by subject and activity
 
-tidy.data <- merge(tidy.data, activity_labels, by.x="activity", by.y="V1", all=TRUE)
-tidy.data$activity <- NULL
+tidy.data <- merge(tidy.data, activity_labels, by.x="activity.id", by.y="V1", all=FALSE)
+tidy.data$activity.id <- NULL
 colnames(tidy.data)[68] <- "activity"
 tidy.data <- arrange(tidy.data[, c(1, 68, 2:67)], subject, activity)
 
