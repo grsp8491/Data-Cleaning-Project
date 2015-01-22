@@ -3,17 +3,18 @@ Project to generate clean and tidy data from the Human Activity Recognition Usin
 See CodeBook.md for information on source data, data files read in, and output file.   
 
 ##Samsung data set
-Per the instructions for the course project, the source code assumes that the Samsung data is in the working directory.   
+Per the instructions for the course project, the source code assumes that the Samsung data is in the working directory.     
+See the CodeBook for a list of the files used.  
 
 ## Source code   
 
 The source code    
 
-1. loads in the library `dplyr`,
+1. loads in the library `dplyr`
 2. lists the eight unzipped data text files to be read in, and makes sure that they are all in the working directory 
-3. reads in the eight files to similarly named tables
-a. some of the numbers being read have scientific notations (for example -2.6050420e-002).    
-The `read.table` function could read these and interpret them correctly, but the data.table `fread` function could not.
+3. reads in the eight files to similarly named tables   
+a. some of the numbers being read have scientific notations (for example -2.6050420e-002)        
+The `read.table` function could read these and interpret them correctly, but the data.table `fread` function could not.    
 b. to shorten the time to read in all the data files by more than 50%, nrows and colClasses were specified for each file in the each read.table function.
 4. attaches activity and subject ids to the X_test and X_train data files
 5. merges the two data files
