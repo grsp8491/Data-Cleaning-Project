@@ -12,7 +12,7 @@
 
 ##Data files
 
-The data files were space-delimited text files.  They were downloaded into the sub-directory “./UCI HAR Dataset/Data” of the working directory.
+The data files were space-delimited text files.  They were downloaded into the working directory.
 
 The tables were then read into R, using the file names as the table names, after removing the “.txt” extensions.
 
@@ -40,14 +40,14 @@ For example, the column name `fBodyAcc-mean()-X` has five components.  In the ti
 
 ##Output file
 
-Name	       tidyData.txt
-Space delimited
-Rows           180 (30 subjects x 6 activities each)
-Columns     68
+Name	       tidyData.txt    
+Space delimited    
+Rows           180 (30 subjects x 6 activities each)    
+Columns     68    
 
 |Column    |Name| Variable type|Description|
 |----------:|:------|:----------------|:------------|
 |1                 |subject|integer  | 1 to 30 subjects, each with 6 activities|
 | 2         |activity  |character   |six activity names repeated for each subject|
-|3 to 68|various mean and std  headings|means of the mean and std numbers|
+|3 to 68|various mean and std  headings|numerical|means of the mean and std numbers|
 
